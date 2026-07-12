@@ -25,20 +25,20 @@ export function LightGuidePanel({
   locationName,
 }: LightGuidePanelProps) {
   return (
-    <div className="pointer-events-auto absolute bottom-4 left-4 right-4 z-10 max-h-[48%] overflow-y-auto border border-line bg-paper/95 p-4 backdrop-blur-sm sm:right-auto sm:max-w-lg">
-      <div className="flex items-start justify-between gap-3">
-        <div>
+    <div className="pointer-events-auto absolute bottom-2 left-2 right-2 z-10 max-h-[42%] overflow-y-auto border border-line bg-paper/95 p-3 backdrop-blur-sm sm:bottom-4 sm:left-4 sm:right-auto sm:max-h-[48%] sm:max-w-lg sm:p-4">
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
+        <div className="min-w-0">
           <p className="label-caps text-accent">
             Light guide · {light.dateLabel}
           </p>
-          <p className="font-display mt-1 text-xl text-ink">
+          <p className="font-display mt-1 truncate text-lg text-ink sm:text-xl">
             {locationName?.trim() || 'Pinned location'}
           </p>
           <p className="mt-0.5 text-xs text-muted">
             Times in {light.timezoneNote}
           </p>
         </div>
-        <div className="box px-2.5 py-1.5 text-right">
+        <div className="box shrink-0 px-2 py-1.5 text-right sm:px-2.5">
           <p className="label-caps">Sun now</p>
           <p className="font-mono text-sm text-accent">
             {light.sunIsUp ? light.sunBearingLabel : 'Below'}

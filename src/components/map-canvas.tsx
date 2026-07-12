@@ -348,7 +348,7 @@ export function MapCanvas({
   return (
     <section
       aria-label="3D location map canvas"
-      className="relative flex h-full min-h-[50vh] flex-1 overflow-hidden bg-paper-soft"
+      className="relative min-h-0 w-full flex-1 overflow-hidden bg-paper-soft"
     >
       <div ref={containerRef} className="absolute inset-0 z-0 h-full w-full" />
 
@@ -361,7 +361,7 @@ export function MapCanvas({
       ) : null}
 
       {mapError && !mapReady ? (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-paper/95 p-6">
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-paper/95 p-4 sm:p-6">
           <div className="box max-w-sm px-4 py-3 text-center">
             <p className="text-sm font-medium text-ink">Map failed to load</p>
             <p className="mt-1 text-xs text-muted">{mapError}</p>
@@ -373,16 +373,19 @@ export function MapCanvas({
         </div>
       ) : null}
 
-      <div className="pointer-events-none absolute left-4 top-4 z-10 flex max-w-sm items-start gap-2 border border-line bg-paper/95 px-3 py-2 backdrop-blur-sm">
+      <div className="pointer-events-none absolute left-2 right-2 top-2 z-10 flex max-w-full items-start gap-2 border border-line bg-paper/95 px-2.5 py-2 backdrop-blur-sm sm:left-4 sm:right-auto sm:top-4 sm:max-w-sm sm:px-3">
         <MapPin className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden />
         <div className="min-w-0">
-          <p className="font-modern text-sm font-semibold tracking-tight text-ink">
+          <p className="truncate font-modern text-sm font-semibold tracking-tight text-ink">
             {locationName?.trim() || 'Unset location'}
           </p>
           <p className="font-mono text-xs text-muted">{coordLabel}</p>
-          <p className="mt-1 flex items-center gap-1 text-[11px] text-muted">
+          <p className="mt-1 hidden items-center gap-1 text-[11px] text-muted sm:flex">
             <Mountain className="size-3 text-accent" aria-hidden />
             MapLibre 3D · drag to orbit · scroll to zoom
+          </p>
+          <p className="mt-1 text-[11px] text-muted sm:hidden">
+            Tap map to pin · pinch to zoom
           </p>
           {showGuide && light?.sunIsUp ? (
             <p className="mt-0.5 text-[11px] text-accent">
