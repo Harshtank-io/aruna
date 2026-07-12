@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { PanelBottom } from 'lucide-react';
 
 import { reverseGeocodeLocation } from '@/app/actions/reverse-geocode';
 import { ScoutingDrawer } from '@/components/scouting-drawer';
@@ -14,7 +15,7 @@ const MapCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex min-h-[50vh] flex-1 items-center justify-center bg-paper-soft text-xs text-muted">
+      <div className="flex min-h-0 flex-1 items-center justify-center bg-paper-soft text-xs text-muted">
         Loading map…
       </div>
     ),
@@ -31,7 +32,32 @@ export default function DashboardPage() {
   } | null>(null);
   const [showGuide, setShowGuide] = useState(false);
   const [photos, setPhotos] = useState<LocationPhoto[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(min-width: 1024px)').matches
+      : false,
+  );
   const [, startGeocode] = useTransition();
+
+  // Desktop: panel always open. Mobile: start closed for fullscreen map.
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => setDrawerOpen(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    if (!drawerOpen || window.matchMedia('(min-width: 1024px)').matches) {
+      return;
+    }
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [drawerOpen]);
 
   const handleMapPick = (coords: {
     latitude: number;
@@ -65,24 +91,33 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-[100dvh] flex-col overflow-hidden bg-paper">
-      <header className="flex shrink-0 items-center justify-between border-b border-line px-5 py-3">
-        <div className="flex items-baseline gap-4">
+      <header className="flex shrink-0 items-center justify-between border-b border-line px-4 py-3 sm:px-5">
+        <div className="flex min-w-0 items-baseline gap-3 sm:gap-4">
           <Link
             href="/"
             className="font-modern text-lg font-bold tracking-tight text-ink"
           >
             Aruna
           </Link>
-          <p className="hidden text-xs text-muted sm:block">
-            Scout desk
-          </p>
+          <p className="hidden text-xs text-muted sm:block">Scout desk</p>
         </div>
-        <span className="border border-line px-2.5 py-1 text-[11px] uppercase tracking-[0.16em] text-muted">
-          Live
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            className="btn-primary px-3 py-2 text-xs uppercase tracking-[0.14em] lg:hidden"
+            aria-expanded={drawerOpen}
+            aria-controls="scouting-drawer"
+            onClick={() => setDrawerOpen(true)}
+          >
+            Scout
+          </button>
+          <span className="hidden shrink-0 border border-line px-2.5 py-1 text-[11px] uppercase tracking-[0.16em] text-muted sm:inline">
+            Live
+          </span>
+        </div>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+      <div className="relative flex min-h-0 flex-1 flex-col lg:flex-row">
         <MapCanvas
           locationName={mapPreview.locationName}
           latitude={mapPreview.latitude}
@@ -92,7 +127,23 @@ export default function DashboardPage() {
           photos={photos}
           onPick={handleMapPick}
         />
+
+        {!drawerOpen ? (
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            className="btn-primary absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2 px-5 py-3 shadow-none lg:hidden"
+            aria-controls="scouting-drawer"
+            aria-expanded={false}
+          >
+            <PanelBottom className="size-4" aria-hidden />
+            Open scout drawer
+          </button>
+        ) : null}
+
         <ScoutingDrawer
+          open={drawerOpen}
+          onOpenChange={setDrawerOpen}
           onValuesChange={(values) => {
             setMapPreview((prev) => {
               const moved =
@@ -111,6 +162,7 @@ export default function DashboardPage() {
           onBriefingReady={(result) => {
             setPhotos(result.photos);
             setShowGuide(true);
+            setDrawerOpen(true);
             setMapPreview((prev) => ({
               ...prev,
               latitude: result.latitude,
