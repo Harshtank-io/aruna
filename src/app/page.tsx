@@ -141,7 +141,7 @@ export default function HomePage() {
       <footer className="flex items-center justify-between border-t border-line px-5 py-6 md:px-10">
         <p className="font-merisca text-lg text-ink">Aruna</p>
         <p className="text-xs uppercase tracking-[0.16em] text-muted">
-          Maps for photographers
+          Maps for photographers · Location scouting &amp; light planning
         </p>
       </footer>
     </div>
